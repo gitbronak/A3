@@ -343,8 +343,91 @@ public class A3 {
         System.out.println("DONE");
     }
 
-    public static void multiply(String matrixTo, String mUno, String mDos)
+    public static void multiply(String matrixTo, String mUno, String mDos) throws SQLException
     {
-        
+        String query = "SELECT * FROM MATRIX WHERE MATRIX_ID = " + mUno + " OR MATRIX_ID = " + mDos;
+        Statement stmt = con.createStatement();
+        ResultSet rs = stmt.executeQuery(query);
+        int row_dim_uno = 0;
+        int row_dim_dos = 0;
+        int col_dim_uno = 0;
+        int col_dim_dos = 0;
+        if(!rs.next())
+        {
+            System.out.println("ERROR");
+            return;
+        }
+        else
+        {
+            row_dim_uno = rs.getInt("ROW_DIM");
+            col_dim_uno = rs.getInt("COL_DIM");
+        }
+        if(!rs.next())
+        {
+            System.out.println("ERROR");
+            return;
+        }
+        else
+        {
+            row_dim_dos = rs.getInt("ROW_DIM");
+            col_dim_dos = rs.getInt("COL_DIM");
+        }
+        if(col_dim_uno != row_dim_dos)
+        {
+            System.out.println("ERROR");
+            return;
+        }
+        deleteMatrix(matrixTo, false);
+        setM(matrixTo, Integer.toString(row_dim_uno), Integer.toString(col_dim_dos), false);
+        Double matrix1[][] = new Double[row_dim_uno][col_dim_uno];
+        Double matrix2[][] = new Double[row_dim_dos][col_dim_dos];
+        Double mult[][] = new Double[row_dim_uno][col_dim_dos];
+        for(int i = 0; i < row_dim_uno; i++)
+        {
+            for(int j= 0; j < col_dim_uno; j++)
+            {
+                matrix1[i][j] = 0.0;
+            }
+        }
+        for(int i = 0; i < row_dim_dos; i++)
+        {
+            for(int j= 0; j < col_dim_dos; j++)
+            {
+                matrix2[i][j] = 0.0;
+            }
+        }
+        for(int i = 0; i < row_dim_uno; i++)
+        {
+            for(int j= 0; j < col_dim_dos; j++)
+            {
+                mult[i][j] = 0.0;
+            }
+        }
+        query = "SELECT * FROM MATRIX_DATA WHERE MATRIX_ID = " + mUno;
+        ResultSet rs1 = stmt.executeQuery(query);
+        while(rs1.next())
+        {
+            matrix1[rs1.getInt("ROW_NUM") - 1][rs1.getInt("COL_NUM") - 1] =  Double.parseDouble(rs1.getString("VALUE")) ; 
+        }
+        query = "SELECT * FROM MATRIX_DATA WHERE MATRIX_ID = " + mDos;
+        ResultSet rs2 = stmt.executeQuery(query);
+        while(rs2.next())
+        {
+            matrix2[rs2.getInt("ROW_NUM") - 1][rs2.getInt("COL_NUM") - 1] =  Double.parseDouble(rs2.getString("VALUE")) ; 
+        }
+        Double sum = 0.0;
+         for ( int c = 0 ; c < row_dim_uno ; c++ )
+         {
+            for (int d = 0 ; d < col_dim_dos ; d++ )
+            {   
+               for (int k = 0 ; k < row_dim_dos ; k++ )
+               {
+                  sum = sum + matrix1[c][k]*matrix2[k][d];
+               }
+               mult[c][d] = sum;
+               setV(matrixTo, Integer.toString(c + 1), Integer.toString(d + 1), Double.toString(mult[c][d]), false);
+               sum = 0.0;
+            }
+         }
     }
 }
