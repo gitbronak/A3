@@ -42,20 +42,55 @@ public class A3 {
                         deleteMatrix(param);    
                     }
                     break;
+                case("GETV"):
+                    getV(stk.nextToken(), stk.nextToken(), stk.nextToken());
+                    break;
+
+                default:
+                    System.out.println("ERROR");
+
             }
         }
 
         con.close();
     }
 
-    public static void getV() throws SQLException
+    public static void getV(String matrix_id, String row, String col) throws SQLException
     {
-        String query = "SELECT COUNT(*) FROM MATRIX";
+        String query = "SELECT * FROM MATRIX WHERE MATRIX_ID = " + matrix_id;
         Statement stmt = con.createStatement();
         ResultSet rs = stmt.executeQuery(query);
-        while (rs.next()) {
+        if (!rs.next()) {
 
-            System.out.println(rs.getString(1));
+            System.out.println("ERROR");
+            return;
+        }
+        else
+        {
+            if(Integer.parseInt(row) > rs.getInt("ROW_DIM"))
+            {
+                System.out.println("ERROR");
+                return;
+            }
+            if(Integer.parseInt(col) > rs.getInt("COL_DIM"))
+            {
+                System.out.println("ERROR");
+                return;
+            }
+
+        }
+
+        query = "SELECT * FROM MATRIX_DATA WHERE MATRIX_ID = " + matrix_id + " AND ROW_NUM = " + row + " AND COL_NUM = " + col;
+        rs = stmt.executeQuery(query);
+        if (!rs.next()) {
+
+            System.out.println("0");
+            return;
+        }
+        else
+        {
+             // TODO set the precision of Value to precision on 1 decimal place.
+            System.out.println(rs.getString("VALUE"));
         }
 
     }
@@ -74,7 +109,12 @@ public class A3 {
 
     public static void deleteMatrix(String param) throws SQLException
     {
-        
+        String query = "DELETE FROM MATRIX_DATA WHERE MATRIX_ID = " + param;
+        Statement stmt = con.createStatement();
+        stmt.executeUpdate(query);
+        query = "DELETE FROM MATRIX WHERE MATRIX_ID = " + param;
+        stmt.executeUpdate(query);
+        System.out.println("DONE");
     }
 }
     	
