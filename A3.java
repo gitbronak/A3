@@ -23,6 +23,10 @@ public class A3 {
         StringTokenizer stk; 
         for(String l : commands)
         {
+            if(l.isEmpty())
+            {
+                break;
+            }
             stk = new StringTokenizer(l);   
             if(!stk.hasMoreTokens())
             {
@@ -147,6 +151,8 @@ public class A3 {
         stmt.executeUpdate(query);
         if(Double.parseDouble(val) == 0)
         {
+            if(msg)
+                System.out.println("DONE");
             return;
         }
         query = "INSERT INTO MATRIX_DATA(MATRIX_ID, ROW_NUM, COL_NUM, VALUE) VALUES( " + matrix_id + ", " + row + ", " + col + ", " + val + ");";
@@ -185,12 +191,12 @@ public class A3 {
         rs = stmt.executeQuery(query);
         if (!rs.next()) {
 
-            System.out.println("0");
+            System.out.println("0.0");
             return;
         }
         else
         {
-            System.out.println(rs.getString("VALUE").substring(0,3));
+            System.out.printf("%.1f\n",Float.parseFloat(rs.getString("VALUE")));
         }
 
     }
@@ -238,10 +244,15 @@ public class A3 {
             row_dim_uno = rs.getInt("ROW_DIM");
             col_dim_uno = rs.getInt("COL_DIM");
         }
-        if(!rs.next())
+        if(!rs.next() && (!mUno.equals(mDos)))
         {
             System.out.println("ERROR");
             return;
+        }
+        else if(mUno.equals(mDos))
+        {
+            row_dim_dos = row_dim_uno;
+            col_dim_dos = col_dim_uno;
         }
         else
         {
@@ -253,8 +264,6 @@ public class A3 {
             System.out.println("ERROR");
             return;
         }
-        deleteMatrix(matrixTo, false);
-        setM(matrixTo, Integer.toString(row_dim_uno), Integer.toString(col_dim_uno), false);
         Double matrix1[][] = new Double[row_dim_uno][col_dim_uno];
         Double matrix2[][] = new Double[row_dim_uno][col_dim_uno];
         Double msum[][] = new Double[row_dim_uno][col_dim_uno];
@@ -278,6 +287,8 @@ public class A3 {
         {
             matrix2[rs2.getInt("ROW_NUM") - 1][rs2.getInt("COL_NUM") - 1] =  Double.parseDouble(rs2.getString("VALUE")) ; 
         }
+        deleteMatrix(matrixTo, false);
+        setM(matrixTo, Integer.toString(row_dim_uno), Integer.toString(col_dim_uno), false);
         for(int i = 0; i < row_dim_uno; i++)
         {
             for(int j= 0; j < col_dim_uno; j++)
@@ -312,8 +323,6 @@ public class A3 {
             col_dim_uno = rs.getInt("COL_DIM");
         }
         rs.close();
-        deleteMatrix(matrix1, false);
-        setM(matrix1, Integer.toString(col_dim_uno), Integer.toString(row_dim_uno), false);
         Double m1[][] = new Double[row_dim_uno][col_dim_uno];
         Double m2[][] = new Double[col_dim_uno][row_dim_uno];
         for(int i = 0; i < row_dim_uno; i++)
@@ -332,6 +341,8 @@ public class A3 {
             m1[rs1.getInt("ROW_NUM") - 1][rs1.getInt("COL_NUM") - 1] =  Double.parseDouble(rs1.getString("VALUE")) ; 
         }
         rs1.close();
+        deleteMatrix(matrix1, false);
+        setM(matrix1, Integer.toString(col_dim_uno), Integer.toString(row_dim_uno), false);
         for(int i = 0; i < row_dim_uno; i++)
         {
             for(int j= 0; j < col_dim_uno; j++)
@@ -362,10 +373,15 @@ public class A3 {
             row_dim_uno = rs.getInt("ROW_DIM");
             col_dim_uno = rs.getInt("COL_DIM");
         }
-        if(!rs.next())
+        if(!rs.next() && (!mUno.equals(mDos)))
         {
             System.out.println("ERROR");
             return;
+        }
+        else if(mUno.equals(mDos))
+        {
+            row_dim_dos = row_dim_uno;
+            col_dim_dos = col_dim_uno;
         }
         else
         {
@@ -377,8 +393,6 @@ public class A3 {
             System.out.println("ERROR");
             return;
         }
-        deleteMatrix(matrixTo, false);
-        setM(matrixTo, Integer.toString(row_dim_uno), Integer.toString(col_dim_dos), false);
         Double matrix1[][] = new Double[row_dim_uno][col_dim_uno];
         Double matrix2[][] = new Double[row_dim_dos][col_dim_dos];
         Double mult[][] = new Double[row_dim_uno][col_dim_dos];
@@ -415,6 +429,8 @@ public class A3 {
         {
             matrix2[rs2.getInt("ROW_NUM") - 1][rs2.getInt("COL_NUM") - 1] =  Double.parseDouble(rs2.getString("VALUE")) ; 
         }
+        deleteMatrix(matrixTo, false);
+        setM(matrixTo, Integer.toString(row_dim_uno), Integer.toString(col_dim_dos), false);
         Double sum = 0.0;
          for ( int c = 0 ; c < row_dim_uno ; c++ )
          {
@@ -429,5 +445,6 @@ public class A3 {
                sum = 0.0;
             }
          }
+         System.out.println("DONE");
     }
 }
